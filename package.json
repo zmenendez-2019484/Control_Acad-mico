@@ -1,0 +1,21 @@
+{
+  "name": "control_academico",
+  "version": "1.0.0",
+  "description": "El proyecto consiste en una aplicación de ambiente web (solamente Backend) la cual servirá para: poder llevar el Control de Alumnos de un Centro Educativo. Todo lo que se le pedirá debe trabajarse con Nodejs, MongoDB y Express.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.2",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1",
+    "mongodb": "^6.3.0",
+    "mongoose": "^8.1.2"
+  }
+}
