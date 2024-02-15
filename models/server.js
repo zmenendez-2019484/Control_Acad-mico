@@ -6,6 +6,7 @@ class Server {
     constructor() {
         this.app = express();
         this.port = process.env.PORT;
+        this.userPath = '/api/users';
         this.dbConnection();
         this.middlewares();
     }
