@@ -17,7 +17,7 @@ const userPost = async (req, res) => {
 
 const getUserById = async (req, res) => {
     const { id } = req.params;
-    const usuario = await User.findOne({_id: id});
+    const usuario = await User.findOne({ _id: id });
 
     res.status(200).json({
         usuario
@@ -41,9 +41,34 @@ const userGet = async (req, res = response) => {
     });
 }
 
+const userDelete = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await User.findByIdAndUpdate(id, { estado: false });
+        const usuario =  await User.findOne({ _id: id });
+        const usuarioAutenticado = req.usuario;
+
+        if (!usuario) {
+            return res.status(400).json({
+                msg: 'Usuario no existe'
+            });
+        }
+        res.status(200).json({
+            msg: 'Usuario eliminado correctamente',
+            usuario,
+            usuarioAutenticado
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            msg: 'Hable con el administrador'
+        });
+    }
+}
 
 module.exports = {
     userPost,
     userGet,
-    getUserById
+    getUserById,
+    userDelete
 }

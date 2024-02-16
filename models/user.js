@@ -24,4 +24,10 @@ const userSchema = new mongoose.Schema({
         enum: ["ADMIN_ROLE", "USER_ROLE"]
     }
 });
+
+userSchema.methods.toJSON = function () {
+    const { __v, password, _id, ...usuario } = this.toObject();
+    usuario.uid = _id;
+    return usuario;
+}
 module.exports = mongoose.model('User', userSchema);
