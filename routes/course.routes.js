@@ -2,11 +2,14 @@ const express = require('express');
 const { Router } = require('express');
 const { tieneRole } = require('../middlewares/validar-roles');
 const { check } = require('express-validator');
-const { coursePost/*, courseGet, coursePut, courseDelete*/ } = require('../controllers/course.controller');
+const { coursePost, getCourses, /*coursePut, courseDelete*/ } = require('../controllers/course.controller');
 const { validarCampos } = require('../middlewares/validar-campos');
 const { validarJWT } = require('../middlewares/validar-jwt');
 
 const router = Router();
+router.get('/', [
+    validarJWT
+], getCourses);
 
 router.post('/', [
     validarJWT,

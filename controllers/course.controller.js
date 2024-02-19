@@ -1,8 +1,18 @@
 const Course = require('../models/curso');
 const User = require('../models/user');
+const { response, json } = require('express');
+const jwt = require('jsonwebtoken');
+const getCourses = async (req, res = response) => {
+    try {
+        
+     } catch {
+        console.log('Error al obtener los cursos:', error);
+        res.status(500).json({
+            error: 'Error interno del servidor'
+        });
 
-
-
+    }
+}
 const coursePost = async (req, res) => {
     const { name, description, teacher } = req.body;
 
@@ -46,5 +56,6 @@ const coursePost = async (req, res) => {
 }
 
 module.exports = {
-    coursePost
+    coursePost,
+    getCourses
 };
