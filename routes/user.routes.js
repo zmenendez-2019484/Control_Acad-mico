@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { check, ExpressValidator } = require('express-validator');
+const { check } = require('express-validator');
 const { validarJWT } = require('../middlewares/validar-jwt');
 const { validarCampos } = require('../middlewares/validar-campos');
 const { tieneRole } = require('../middlewares/validar-roles');
