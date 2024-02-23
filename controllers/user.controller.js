@@ -2,86 +2,76 @@ const { response } = require('express');
 const bcryptjs = require('bcryptjs');
 const User = require('../models/user');
 
-const userPost = async (req, res) => {
-    const { name, email, password, role } = req.body;
-    const usuario = new User({ name, email, password, role });
-
-    const salt = bcryptjs.genSaltSync();
-    usuario.password = bcryptjs.hashSync(password, salt);
-
-    await usuario.save();
-    res.status(200).json({
-        usuario
-    });
-}
-
-const getUserById = async (req, res) => {
-    const { id } = req.params;
-    const usuario = await User.findOne({ _id: id });
-
-    res.status(200).json({
-        usuario
-    });
-}
-
-const userGet = async (req, res = response) => {
-    const { limite, desde } = req.query;
-    const query = { estado: true };
-
-    const [total, usuarios] = await Promise.all([
-        User.countDocuments(query),
-        User.find(query)
-            .skip(Number(desde))
-            .limit(Number(limite))
-    ]);
-
-    res.json({
-        total,
-        usuarios
-    });
-}
-
 const userDelete = async (req, res) => {
     try {
         const { id } = req.params;
-        await User.findByIdAndUpdate(id, { estado: false });
-        const usuario =  await User.findOne({ _id: id });
-        const usuarioAutenticado = req.usuario;
+        const usuario = await User.findById(id);
 
         if (!usuario) {
             return res.status(400).json({
-                msg: 'Usuario no existe'
+                msg: 'Usuario no encontrado'
             });
         }
+
+        // Verificar si el usuario tiene permiso y si es el mismo usuario
+        const usuarioAutenticado = req.usuario;
+        if (usuarioAutenticado._id !== id || usuarioAutenticado.role !== 'STUDENT_ROLE') {
+            return res.status(403).json({
+                msg: 'No tienes permiso para eliminar este perfil'
+            });
+        }
+
+        usuario.estado = false;
+        await usuario.save();
+
         res.status(200).json({
-            msg: 'Usuario eliminado correctamente',
-            usuario,
-            usuarioAutenticado
+            msg: 'Perfil a.ctualizado correctamente',
+            usuario
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             msg: 'Hable con el administrador'
         });
     }
 }
-
 const userPut = async (req, res) => {
-    const { id } = req.params;
-    const { _id, name, password, ...resto } = req.body;
+    try {
+        const { id } = req.params;
+        const { _id, password, ...resto } = req.body;
 
-    await User.findByIdAndUpdate(id, resto);
-    const usuario = await User.findOne({ _id: id });
-    res.status(200).json({
-        msg: 'Usuario actualizado correctamente',
-        usuario
-    });
-}
+        const usuarioAutenticado = req.usuario;
+        const idCoincide = usuarioAutenticado._id.toString() === id;
+        const tienePermiso = usuarioAutenticado.role === 'STUDENT_ROLE';
 
+        if (!idCoincide || !tienePermiso) {
+            return res.status(403).json({
+                msg: 'No tienes permiso para actualizar este usuario',
+            });
+        }
+
+        // Buscar y actualizar el usuario
+        const usuario = await User.findByIdAndUpdate(id, resto, { new: true });
+        if (!usuario) {
+            return res.status(400).json({
+                msg: 'Usuario no encontrado',
+            });
+        }
+
+        res.status(200).json({
+            msg: 'Usuario actualizado correctamente',
+            usuario,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            msg: 'Hable con el administrador',
+        });
+    }
+};
+ 
 module.exports = {
-    userPost,
-    userGet,
-    getUserById,
+
     userDelete,
     userPut
 }

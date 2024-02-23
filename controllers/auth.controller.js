@@ -1,5 +1,5 @@
 const User = require('../models/user');
-const bcrypt = require('bcryptjs');
+const bcryptjs = require('bcryptjs');
 const { generarJWT } = require('../helpers/generar-jwt');
 const user = require('../models/user');
 
@@ -29,7 +29,7 @@ const login = async (req, res) => {
             });
         }
         // Verificar la contraseña
-        const validPassword = bcrypt.compareSync(password, usuario.password);
+        const validPassword = bcryptjs.compareSync(password, usuario.password);
         if (!validPassword) {
             return res.status(400).json({
                 msg: 'La contraseña es incorrecta'
@@ -51,6 +51,18 @@ const login = async (req, res) => {
         });
     }
 }
+const register = async (req, res) => {
+    const { name, email, password, role } = req.body;
+    const usuario = new User({ name, email, password, role });
+
+    const salt = bcryptjs.genSaltSync();
+    usuario.password = bcryptjs.hashSync(password, salt);
+
+    await usuario.save();
+    res.status(200).json({
+        usuario
+    });
+}
 
 function getMyRole() {
     return myRole;
@@ -58,5 +70,6 @@ function getMyRole() {
 
 module.exports = {
     login,
-    getMyRole
+    getMyRole,
+    register
 }
