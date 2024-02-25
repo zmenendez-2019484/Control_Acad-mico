@@ -2,10 +2,12 @@ const Course = require('../models/curso');
 const User = require('../models/user');
 const { response, json } = require('express');
 const jwt = require('jsonwebtoken');
-
+const UserHasCourse = require('../models/UserHasCurso');
+//alumnos
 const asignarCursoAEstudiante = async (req, res) => {
     try {
-        const { userId, courseId } = req.params;
+        const { userId } = req.params;
+        const { courseId } = req.body;
         const usuarioAutenticado = req.usuario;
 
         // Verificar si el usuario es el mismo que intenta asignar el curso
@@ -48,7 +50,6 @@ const asignarCursoAEstudiante = async (req, res) => {
         });
     }
 };
-
 const cursosPorEstudiante = async (req, res) => {
     try {
         const { userId } = req.params;
@@ -64,14 +65,14 @@ const cursosPorEstudiante = async (req, res) => {
         // Buscar las asignaciones del alumno
         const assignments = await UserHasCourse.find({ user: userId });
 
-        // Encontrar los IDs de los cursos
+        // Encontrar los id de los cursos
         const courseIds = assignments.map(assignment => assignment.course);
 
-        // Buscar los detalles de los cursos
-        const courses = await Course.find({ _id: { $in: courseIds } });
+        // Buscar los detalles de los cursos con estado true
+        const courses = await Course.find({ _id: { $in: courseIds }, estado: true });
 
         res.status(200).json({
-            msg: 'Cursos obtenidos correctamente',
+            msg: 'A estos cursos estas asignado correctamente:',
             courses,
         });
 
@@ -83,6 +84,7 @@ const cursosPorEstudiante = async (req, res) => {
     }
 };
 
+//profesores
 const postCourse = async (req, res) => {
     try {
         const { name, description } = req.body;

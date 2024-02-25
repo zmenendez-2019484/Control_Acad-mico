@@ -8,22 +8,24 @@ const { validarCampos } = require('../middlewares/validar-campos');
 const { validarJWT } = require('../middlewares/validar-jwt');
 
 const router = Router();
-
+// alumnos
 router.get('/students/:userId/courses', [
     validarJWT,
     tieneRole('STUDENT_ROLE'),
     cursosPorEstudiante
 ]);
 
-router.post('/students/:userId/courses/:courseId', [
+router.post('/students/:userId/courses', [
     validarJWT,
     tieneRole('STUDENT_ROLE'),
-    check('userId', 'El ID del usuario es requerido').notEmpty(),
     check('courseId', 'El ID del curso es requerido').notEmpty(),
     validarCampos,
     asignarCursoAEstudiante
 ]);
 
+
+
+//profesores
 router.post('/', [
     validarJWT,
     tieneRole('TEACHER_ROLE'),
