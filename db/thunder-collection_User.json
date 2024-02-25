@@ -1,0 +1,52 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "User",
+    "dateExported": "2024-02-25T19:07:27.937Z",
+    "version": "1.1",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "20a508b0-a5ef-4326-b2c1-3b116efb72d9",
+            "colId": "0d8e7812-56c3-4062-85ce-f950936d526c",
+            "containerId": "",
+            "name": "userDelete",
+            "url": "http://localhost:3000/api/users/65d8c8d9b6934358baece716",
+            "method": "DELETE",
+            "sortNum": 40000,
+            "created": "2024-02-16T05:57:46.317Z",
+            "modified": "2024-02-23T16:34:09.743Z",
+            "headers": [
+                {
+                    "name": "x-token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2NWNmNzEyZDVhNjAzZmZjZDM1MTFkZWQiLCJpYXQiOjE3MDg3MDYwMjMsImV4cCI6MTcwODcwOTYyM30.Lkwz_E7Qfvn0ctIyKoavngiwvwqr7SCkLUl3-IlOqK0"
+                }
+            ],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "1a2c45cf-969e-4ec0-8baa-5baff545d1f4",
+            "colId": "0d8e7812-56c3-4062-85ce-f950936d526c",
+            "containerId": "",
+            "name": "UserPut",
+            "url": "http://localhost:3000/api/users/65d8c8d9b6934358baece716",
+            "method": "PUT",
+            "sortNum": 60000,
+            "created": "2024-02-16T13:58:26.340Z",
+            "modified": "2024-02-23T17:13:53.433Z",
+            "headers": [
+                {
+                    "name": "x-token",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2NWQ4YzhkOWI2OTM0MzU4YmFlY2U3MTYiLCJpYXQiOjE3MDg3MDc1ODAsImV4cCI6MTcwODcxMTE4MH0.DPTLNxJGO4DkCHJhA3f2c0zcWcB9SNb0dDN2_stbtlg"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"name\": \"mama mia\"\n\n}",
+                "form": []
+            },
+            "tests": []
+        }
+    ]
+}
