@@ -2,60 +2,89 @@ const Course = require('../models/curso');
 const User = require('../models/user');
 const { response, json } = require('express');
 const jwt = require('jsonwebtoken');
-const getCourses = async (req, res = response) => {
+
+const asignarCursoAEstudiante = async (req, res) => {
     try {
-        
-     } catch {
-        console.log('Error al obtener los cursos:', error);
-        res.status(500).json({
-            error: 'Error interno del servidor'
-        });
+        const { userId, courseId } = req.params;
+        const usuarioAutenticado = req.usuario;
 
-    }
-}
-const coursePost = async (req, res) => {
-    const { name, description, teacher } = req.body;
-
-    // Verificar si todos los campos requeridos están presentes y no son nulos o vacíos
-    if (!name || !description || !teacher) {
-        return res.status(400).json({
-            error: 'Todos los campos son requeridos'
-        });
-    }
-
-    // Verificar si los campos requeridos no están vacíos
-    if (name.trim() === '' || description.trim() === '' || teacher.trim() === '') {
-        return res.status(400).json({
-            error: 'Todos los campos deben tener contenido'
-        });
-    }
-
-    try {
-        // Verificar si el profesor existe en la base de datos
-        const profesor = await User.findById(teacher);
-        if (!profesor || profesor.role !== 'TEACHER_ROLE') {
-            return res.status(400).json({
-                error: 'El profesor proporcionado no existe o no es un profesor válido'
+        // Verificar si el usuario es el mismo que intenta asignar el curso
+        if (usuarioAutenticado._id.toString() !== userId || usuarioAutenticado.role !== 'STUDENT_ROLE') {
+            return res.status(403).json({
+                msg: 'No tienes permiso para asignar este curso',
             });
         }
 
-        // Si el profesor existe, crear y guardar el curso
-        const course = new Course({ name, description, teacher });
-        await course.save();
+        // Contar las asignaciones existentes del alumno
+        const existingAssignments = await UserHasCourse.countDocuments({ user: userId });
 
-        res.status(201).json({
-            course
+        // Verificar si el alumno ya está asignado a  3 cursos
+        if (existingAssignments >= 3) {
+            return res.status(400).json({
+                msg: 'El alumno ya está asignado a  3 cursos',
+            });
+        }
+
+        // Verificar si el alumno ya está asignado a este curso
+        const existingAssignment = await UserHasCourse.findOne({ user: userId, course: courseId });
+        if (existingAssignment) {
+            return res.status(400).json({
+                msg: 'El alumno ya está asignado a este curso',
+            });
+        }
+
+        // Asignar el curso al alumno
+        const asignacion = new UserHasCourse({ user: userId, course: courseId });
+        await asignacion.save();
+
+        res.status(200).json({
+            msg: 'Curso asignado correctamente',
+            asignacion,
         });
     } catch (error) {
-        console.error('Error al guardar el curso:', error);
+        console.error(error);
         res.status(500).json({
-            error: 'Error interno del servidor'
+            msg: 'Hable con el administrador',
         });
     }
+};
 
-}
+const cursosPorEstudiante = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const usuarioAutenticado = req.usuario;
+
+        // Verificar si el usuario autenticado es el mismo que intenta ver los cursos
+        if (usuarioAutenticado._id.toString() !== userId || usuarioAutenticado.role !== 'STUDENT_ROLE') {
+            return res.status(403).json({
+                msg: 'No tienes permiso para ver los cursos de este usuario',
+            });
+        }
+
+        // Buscar las asignaciones del alumno
+        const assignments = await UserHasCourse.find({ user: userId });
+
+        // Extraer los IDs de los cursos
+        const courseIds = assignments.map(assignment => assignment.course);
+
+        // Buscar los detalles de los cursos
+        const courses = await Course.find({ _id: { $in: courseIds } });
+
+        res.status(200).json({
+            msg: 'Cursos obtenidos correctamente',
+            courses,
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            msg: 'Hable con el administrador',
+        });
+    }
+};
+
 
 module.exports = {
-    coursePost,
-    getCourses
+    asignarCursoAEstudiante,
+    cursosPorEstudiante
 };
