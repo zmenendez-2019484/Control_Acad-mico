@@ -1,0 +1,47 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "authLogin",
+    "dateExported": "2024-02-25T21:34:41.122Z",
+    "version": "1.1",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "b822396e-e1a5-433b-9fe9-d20efe74f1ed",
+            "colId": "5f11723c-4662-4759-b42c-018b55af8311",
+            "containerId": "",
+            "name": "Login",
+            "url": "http://localhost:3000/api/auth/login",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2024-02-16T04:00:28.875Z",
+            "modified": "2024-02-25T21:24:17.295Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"email\": \"amendez@kinal.edu.gt\",\n  \"password\": \"123456\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "3fadfb9f-15a1-422e-8bea-3e57cd2fba20",
+            "colId": "5f11723c-4662-4759-b42c-018b55af8311",
+            "containerId": "",
+            "name": "Register",
+            "url": "http://localhost:3000/api/auth/register",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2024-02-23T15:51:34.094Z",
+            "modified": "2024-02-23T16:33:29.340Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"name\": \"Pedro Medina\",\n  \"email\": \"pmedina@kinal.edu.gt\",\n  \"password\": \"123456\"\n}",
+                "form": []
+            },
+            "tests": []
+        }
+    ]
+}
