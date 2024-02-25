@@ -10,15 +10,22 @@ const asignarCursoAEstudiante = async (req, res) => {
         const { courseId } = req.body;
         const usuarioAutenticado = req.usuario;
 
-        // Verificar si el usuario es el mismo que intenta asignar el curso
+        // Comprueba si el usuario es el mismo que intenta asignar el curso
         if (usuarioAutenticado._id.toString() !== userId || usuarioAutenticado.role !== 'STUDENT_ROLE') {
             return res.status(403).json({
                 msg: 'No tienes permiso para asignar este curso',
             });
         }
 
-        // Contar las asignaciones existentes del alumno
-        const existingAssignments = await UserHasCourse.countDocuments({ user: userId });
+        // Comprueba si el curso está en true
+        const course = await Course.findById(courseId);
+        if (!course || course.estado !== true) {
+            return res.status(400).json({
+                msg: 'Este curso no existe',
+            });
+        }
+
+        const existingAssignments = await UserHasCourse.countDocuments({ user: userId, estado: true });
 
         // Verificar si el alumno ya está asignado a  3 cursos
         if (existingAssignments >= 3) {
@@ -50,25 +57,26 @@ const asignarCursoAEstudiante = async (req, res) => {
         });
     }
 };
+
 const cursosPorEstudiante = async (req, res) => {
     try {
         const { userId } = req.params;
         const usuarioAutenticado = req.usuario;
+        //console.log("userId recibido:", userId);
 
-        // Verificar si el usuario es el mismo que intenta ver los cursos
         if (usuarioAutenticado._id.toString() !== userId || usuarioAutenticado.role !== 'STUDENT_ROLE') {
             return res.status(403).json({
                 msg: 'No tienes permiso para ver los cursos de este usuario',
             });
         }
 
-        // Buscar las asignaciones del alumno
-        const assignments = await UserHasCourse.find({ user: userId });
+        // Buscar las asignaciones del alumno que tienen estado true
+        const assignments = await UserHasCourse.find({ user: userId, estado: true });
 
-        // Encontrar los id de los cursos
+        //console.log(assignments)
+
         const courseIds = assignments.map(assignment => assignment.course);
-
-        // Buscar los detalles de los cursos con estado true
+        // console.log(courseIds);
         const courses = await Course.find({ _id: { $in: courseIds }, estado: true });
 
         res.status(200).json({
@@ -83,6 +91,8 @@ const cursosPorEstudiante = async (req, res) => {
         });
     }
 };
+
+
 
 //profesores
 const postCourse = async (req, res) => {
@@ -169,14 +179,20 @@ const deleteCourse = async (req, res) => {
         course.estado = false;
         await course.save();
 
-        // Desasignar a los alumnos del curso
+        // Desasignar a los alumnos del curso en UserHasCourse
+        await UserHasCourse.updateMany(
+            { course: courseId },
+            { $set: { estado: false } }
+        );
+
+        // Desasignar a los alumnos del curso en la colección User
         await User.updateMany(
             { 'courses.courseId': courseId },
             { $pull: { courses: { courseId: courseId } } }
         );
 
         res.status(200).json({
-            msg: 'Curso eliminado correctamente',
+            msg: 'Curso eliminado correctamente y alumnos desasignados',
         });
     } catch (error) {
         console.error(error);
@@ -185,6 +201,7 @@ const deleteCourse = async (req, res) => {
         });
     }
 };
+
 
 const cursosDeProfesor = async (req, res) => {
     try {
@@ -195,7 +212,7 @@ const cursosDeProfesor = async (req, res) => {
         });
 
         // Verificar si hay cursos disponibles
-        if (courses.length ===  0) {
+        if (courses.length === 0) {
             return res.status(200).json({
                 msg: 'No tienes cursos disponibles',
                 courses: []
