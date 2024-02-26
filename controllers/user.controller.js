@@ -1,7 +1,6 @@
 const { response } = require('express');
 const bcryptjs = require('bcryptjs');
 const User = require('../models/user');
-
 const userDelete = async (req, res) => {
     try {
         const { id } = req.params;
@@ -13,19 +12,21 @@ const userDelete = async (req, res) => {
             });
         }
 
-        // Verificar si el usuario tiene permiso y si es el mismo usuario
+        // Comprueba si el usuario tiene permiso y si es el mismo usuario
         const usuarioAutenticado = req.usuario;
-        if (usuarioAutenticado._id !== id || usuarioAutenticado.role !== 'STUDENT_ROLE') {
-            return res.status(403).json({
-                msg: 'No tienes permiso para eliminar este perfil'
-            });
+        if (usuarioAutenticado._id !== id) {
+            if (usuarioAutenticado.role !== 'STUDENT_ROLE') {
+                return res.status(403).json({
+                    msg: 'No tienes permiso para eliminar este perfil'
+                });
+            }
         }
 
         usuario.estado = false;
         await usuario.save();
 
         res.status(200).json({
-            msg: 'Perfil a.ctualizado correctamente',
+            msg: 'Perfil actualizado correctamente',
             usuario
         });
     } catch (error) {
@@ -35,6 +36,8 @@ const userDelete = async (req, res) => {
         });
     }
 }
+
+
 const userPut = async (req, res) => {
     try {
         const { id } = req.params;
@@ -69,7 +72,7 @@ const userPut = async (req, res) => {
         });
     }
 };
- 
+
 module.exports = {
 
     userDelete,
